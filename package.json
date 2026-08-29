@@ -1,11 +1,9 @@
 {
-  "name": "ausdmusic-auth-api",
+  "name": "ausdmusic-auth",
   "version": "1.0.0",
-  "description": "AusDMusic Email OTP Authentication API",
   "main": "api/index.js",
   "scripts": {
-    "start": "node api/index.js",
-    "dev": "node dev.js"
+    "start": "node api/index.js"
   },
   "dependencies": {
     "cors": "^2.8.5",
