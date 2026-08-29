@@ -46,6 +46,21 @@ function authenticateToken(req, res, next) {
   });
 }
 
+app.get('/', (req, res) => {
+  res.json({
+    status: 'online',
+    message: 'AusDMusic Auth API Server is running!',
+    endpoints: {
+      health: '/api/health',
+      sendOtp: 'POST /api/auth/send-otp',
+      verifyOtp: 'POST /api/auth/verify-otp',
+      me: 'GET /api/auth/me',
+      logout: 'POST /api/auth/logout'
+    },
+    time: new Date().toISOString()
+  });
+});
+
 app.get('/api/health', (req, res) => {
   res.json({ status: 'ok', service: 'AusDMusic Auth API', time: new Date().toISOString() });
 });
