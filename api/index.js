@@ -76,10 +76,9 @@ function authenticateToken(req, res, next) {
   });
 }
 
-// --- ROUTES ---
+// --- HANDLERS ---
 
-// Root Status
-app.get('/', (req, res) => {
+const handleRoot = (req, res) => {
   res.json({
     status: 'online',
     message: 'AusDMusic Auth API Server is running!',
@@ -92,15 +91,13 @@ app.get('/', (req, res) => {
     },
     time: new Date().toISOString()
   });
-});
+};
 
-// Health Check
-app.get('/api/health', (req, res) => {
+const handleHealth = (req, res) => {
   res.json({ status: 'ok', service: 'AusDMusic Auth API', time: new Date().toISOString() });
-});
+};
 
-// 1. Send OTP
-app.post('/api/auth/send-otp', async (req, res) => {
+const handleSendOtp = async (req, res) => {
   try {
     const { email } = req.body;
 
@@ -161,10 +158,9 @@ app.post('/api/auth/send-otp', async (req, res) => {
       error: error.message,
     });
   }
-});
+};
 
-// 2. Verify OTP
-app.post('/api/auth/verify-otp', async (req, res) => {
+const handleVerifyOtp = async (req, res) => {
   try {
     const { email, otp, name } = req.body;
 
@@ -245,10 +241,9 @@ app.post('/api/auth/verify-otp', async (req, res) => {
     console.error('[AUTH] Error verifying OTP:', error);
     return res.status(500).json({ success: false, message: 'Terjadi kesalahan saat memverifikasi OTP', error: error.message });
   }
-});
+};
 
-// 3. Get User Profile (Protected)
-app.get('/api/auth/me', authenticateToken, (req, res) => {
+const handleMe = (req, res) => {
   const user = userStore.get(req.user.email) || req.user;
   res.json({
     success: true,
@@ -259,12 +254,20 @@ app.get('/api/auth/me', authenticateToken, (req, res) => {
       createdAt: user.createdAt,
     },
   });
-});
+};
 
-// 4. Logout
-app.post('/api/auth/logout', (req, res) => {
+const handleLogout = (req, res) => {
   res.json({ success: true, message: 'Logout berhasil' });
-});
+};
+
+// --- REGISTER ROUTES (BOTH WITH AND WITHOUT /api PREFIX) ---
+
+app.get(['/', '/api'], handleRoot);
+app.get(['/health', '/api/health'], handleHealth);
+app.post(['/auth/send-otp', '/api/auth/send-otp'], handleSendOtp);
+app.post(['/auth/verify-otp', '/api/auth/verify-otp'], handleVerifyOtp);
+app.get(['/auth/me', '/api/auth/me'], authenticateToken, handleMe);
+app.post(['/auth/logout', '/api/auth/logout'], handleLogout);
 
 module.exports = app;
 
